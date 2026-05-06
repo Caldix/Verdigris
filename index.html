@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RhymeTime</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a1a0a, #0f2010, #1a3010);
+            font-family: 'Lato', sans-serif;
+            color: #fff;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #b8860b, #d4a017, #6abf69);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6abf69;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* LANGUAGE SELECTOR */
+        .lang-selector {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .lang-btn {
+            padding: 8px 20px;
+            border: 2px solid rgba(180, 134, 11, 0.3);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-family: 'Lato', sans-serif;
+            background: rgba(180, 134, 11, 0.05);
+            color: #fff;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-btn:hover {
+            background: rgba(180, 134, 11, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #b8860b, #6abf69);
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+        }
+
+        .lang-flag { font-size: 1.2em; }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-family: 'Lato', sans-serif;
+            transition: all 0.3s;
+            background: rgba(106, 191, 105, 0.1);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #b8860b, #6abf69);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: rgba(106, 191, 105, 0.2);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* GAME CARD */
+        .game-card {
+            background: rgba(106, 191, 105, 0.05);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        /* AI TOGGLE */
+        .ai-toggle-section {
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(184, 134, 11, 0.2);
+        }
+
+        .ai-toggle-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: rgba(184, 134, 11, 0.08);
+            cursor: pointer;
+            transition: background 0.3s;
+            user-select: none;
+        }
+
+        .ai-toggle-header:hover {
+            background: rgba(184, 134, 11, 0.15);
+        }
+
+        .ai-toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-toggle-title {
+            font-size: 1em;
+            font-weight: bold;
+            color: #d4a017;
+        }
+
+        .ai-badge {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(106, 191, 105, 0.2);
+            color: #6abf69;
+            border: 1px solid rgba(106, 191, 105, 0.3);
+        }
+
+        .ai-badge.active {
+            background: rgba(106, 191, 105, 0.3);
+            color: #6abf69;
+        }
+
+        /* TOGGLE SWITCH */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.15);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #b8860b, #6abf69);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* AI KEY PANEL */
+        .ai-key-panel {
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .ai-key-panel.visible {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-key-label {
+            color: #a5b4fc;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ai-key-label a {
+            color: #6abf69;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .ai-key-label a:hover {
+            text-decoration: underline;
+        }
+
+        .ai-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ai-key-input {
+            flex: 1;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.9em;
+            outline: none;
+            font-family: monospace;
+            transition: border 0.3s;
+        }
+
+        .ai-key-input:focus {
+            border-color: #b8860b;
+            box-shadow: 0 0 8px rgba(184, 134, 11, 0.2);
+        }
+
+        .ai-key-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .ai-status {
+            margin-top: 8px;
+            font-size: 0.82em;
+            min-height: 18px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .ai-status.ok { color: #6abf69; }
+        .ai-status.error { color: #fca5a5; }
+        .ai-status.info { color: #d4a017; }
+
+        /* TITLE */
+        .title-section { margin-bottom: 25px; }
+
+        .title-section label {
+            display: block;
+            color: #b8860b;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .title-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(184, 134, 11, 0.08);
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.2em;
+            font-family: 'Playfair Display', serif;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .title-input:focus {
+            border-color: #b8860b;
+            box-shadow: 0 0 10px rgba(184, 134, 11, 0.2);
+        }
+
+        .title-input::placeholder { color: rgba(255,255,255,0.3); }
+
+        /* VERSES */
+        .verses-container { margin-bottom: 20px; }
+
+        .verse {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .verse-number {
+            min-width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-top: 12px;
+        }
+
+        .verse-number.generated {
+            background: linear-gradient(135deg, #b8860b, #d4a017);
+            color: #0a1a0a;
+        }
+
+        .verse-number.user {
+            background: linear-gradient(135deg, #4a9e48, #6abf69);
+            color: #0a1a0a;
+        }
+
+        .verse-text {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .verse-text.generated {
+            background: rgba(184, 134, 11, 0.1);
+            border-left: 3px solid #b8860b;
+            color: #d4a017;
+            font-style: italic;
+        }
+
+        .verse-text.user-written {
+            background: rgba(106, 191, 105, 0.1);
+            border-left: 3px solid #6abf69;
+            color: #6abf69;
+        }
+
+        .verse-text.loading {
+            background: rgba(184, 134, 11, 0.05);
+            border-left: 3px solid #b8860b;
+            color: #b8860b;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* LOADING DOTS */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #b8860b;
+            animation: bounce 1.2s infinite;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* INPUT */
+        .input-area { margin-bottom: 20px; }
+
+        .input-label {
+            color: #6abf69;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .verse-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(106, 191, 105, 0.08);
+            border: 1px solid rgba(106, 191, 105, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1em;
+            font-family: 'Playfair Display', serif;
+            outline: none;
+            transition: border 0.3s;
+            resize: none;
+            height: 60px;
+        }
+
+        .verse-input:focus {
+            border-color: #6abf69;
+            box-shadow: 0 0 10px rgba(106, 191, 105, 0.2);
+        }
+
+        .verse-input::placeholder {
+            color: rgba(255,255,255,0.3);
+            font-style: italic;
+        }
+
+        /* RIME */
+        .rime-section { margin-bottom: 20px; }
+
+        .rime-label {
+            color: #d4a017;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .rime-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .rime-tag {
+            padding: 5px 12px;
+            background: rgba(212, 160, 23, 0.15);
+            border: 1px solid rgba(212, 160, 23, 0.3);
+            border-radius: 20px;
+            color: #d4a017;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .rime-tag:hover {
+            background: rgba(212, 160, 23, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* PROGRESS */
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b8860b, #d4a017, #6abf69);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #6abf69;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+        }
+
+        /* BUTTONS */
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-family: 'Lato', sans-serif;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #b8860b, #6abf69);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 134, 11, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(106, 191, 105, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(106, 191, 105, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4a9e48, #6abf69);
+            color: #0a1a0a;
+            box-shadow: 0 4px 15px rgba(106, 191, 105, 0.3);
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(106, 191, 105, 0.5);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* FINAL POEM */
+        .final-poem {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .final-poem h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #b8860b, #6abf69);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .final-poem .poem-lines {
+            margin: 20px 0;
+            text-align: left;
+            background: rgba(106, 191, 105, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(184, 134, 11, 0.2);
+        }
+
+        .final-poem .poem-line {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1em;
+            line-height: 2;
+        }
+
+        .final-poem .poem-line.gen {
+            color: #d4a017;
+            font-style: italic;
+        }
+
+        .final-poem .poem-line.usr { color: #6abf69; }
+
+        /* SAVED POEMS */
+        .saved-poems { display: grid; gap: 20px; }
+
+        .poem-card {
+            background: rgba(106, 191, 105, 0.05);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .poem-card:hover {
+            border-color: rgba(184, 134, 11, 0.5);
+            box-shadow: 0 4px 20px rgba(184, 134, 11, 0.1);
+        }
+
+        .poem-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .poem-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3em;
+            color: #d4a017;
+        }
+
+        .poem-card-meta {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .poem-card-date {
+            font-size: 0.8em;
+            color: #64748b;
+        }
+
+        .poem-card-lang {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(184, 134, 11, 0.2);
+            color: #d4a017;
+        }
+
+        .poem-card-ai {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(106, 191, 105, 0.2);
+            color: #6abf69;
+        }
+
+        .poem-card-lines {
+            font-family: 'Playfair Display', serif;
+            line-height: 1.8;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .poem-card-line.gen {
+            color: #d4a017;
+            font-style: italic;
+        }
+
+        .poem-card-line.usr { color: #6abf69; }
+
+        .poem-card-actions { display: flex; gap: 8px; }
+
+        .no-poems {
+            text-align: center;
+            color: #64748b;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        /* NOTIFICATION */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #b8860b, #6abf69);
+            color: #0a1a0a;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transform: translateY(100px);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+
+        .notification.show { transform: translateY(0); }
+
+        .decoration {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0.05;
+            font-size: 15em;
+            z-index: 0;
+        }
+
+        .dec1 { top: -50px; right: -50px; }
+        .dec2 { bottom: -50px; left: -50px; }
+    </style>
+</head>
+<body>
+
+<div class="decoration dec1">✍️</div>
+<div class="decoration dec2">🌿</div>
+
+<div class="container">
+    <h1 id="main-title">✨ RhymeTime ✨</h1>
+    <p class="subtitle" id="main-subtitle">Where every line finds its rhyme</p>
+
+    <!-- LANGUAGE SELECTOR -->
+    <div class="lang-selector">
+        <button class="lang-btn active" id="lang-ro" onclick="setLanguage('ro')">
+            <span class="lang-flag">🇷🇴</span> Română
+        </button>
+        <button class="lang-btn" id="lang-en" onclick="setLanguage('en')">
+            <span class="lang-flag">🇬🇧</span> English
+        </button>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-btn-game" onclick="switchTab('game', event)">
+            ✍️ <span id="tab-write-label">Scrie Poezie</span>
+        </button>
+        <button class="tab-btn" id="tab-btn-saved" onclick="switchTab('saved', event)">
+            📚 <span id="tab-saved-label">Poeziile Mele</span>
+        </button>
+    </div>
+
+    <!-- GAME TAB -->
+    <div id="tab-game" class="tab-content active">
+        <div class="game-card">
+
+            <!-- AI TOGGLE -->
+            <div class="ai-toggle-section">
+                <div class="ai-toggle-header" onclick="toggleAiPanel()">
+                    <div class="ai-toggle-left">
+                        <span>🤖</span>
+                        <span class="ai-toggle-title" id="ai-toggle-title">
+                            Enable AI Powered
+                        </span>
+                        <span class="ai-badge" id="ai-badge">OFF</span>
+                    </div>
+                    <label class="toggle-switch" onclick="event.stopPropagation()">
+                        <input type="checkbox" id="ai-toggle" onchange="onAiToggleChange()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="ai-key-panel" id="ai-key-panel">
+                    <p class="ai-key-label" id="ai-key-label">
+                        🔑 <span id="ai-key-label-text">Paste your Gemini API Key</span>
+                        &nbsp;·&nbsp;
+                        <a href="https://aistudio.google.com" target="_blank">
+                            Get free key ↗
+                        </a>
+                    </p>
+                    <div class="ai-input-row">
+                        <input
+                            type="password"
+                            class="ai-key-input"
+                            id="api-key-input"
+                            placeholder="AIzaSy..."
+                        >
+                        <button class="btn btn-primary" id="ai-save-btn" onclick="saveApiKey()">
+                            ✅ <span id="ai-save-label">Save</span>
+                        </button>
+                    </div>
+                    <p class="ai-status" id="ai-status"></p>
+                </div>
+            </div>
+
+            <!-- TITLE -->
+            <div class="title-section" style="margin-top: 20px;">
+                <label id="title-label">📌 Titlul poeziei</label>
+                <input type="text" class="title-input" id="poem-title"
+                    placeholder="Dă un titlu poeziei tale...">
+            </div>
+
+            <!-- PROGRESS -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+            <p class="progress-text" id="progress-text">Vers 0 din 8</p>
+
+            <!-- VERSES -->
+            <div class="verses-container" id="verses-container"></div>
+
+            <!-- RIME -->
+            <div class="rime-section" id="rime-section" style="display:none">
+                <p class="rime-label" id="rime-label">💡 Sugestii de rimă</p>
+                <div class="rime-tags" id="rime-tags"></div>
+            </div>
+
+            <!-- INPUT -->
+            <div class="input-area" id="input-area">
+                <p class="input-label" id="input-label">Apasă "Începe" pentru a porni jocul</p>
+                <textarea
+                    class="verse-input"
+                    id="verse-input"
+                    placeholder="Scrie versul tău aici..."
+                    disabled
+                ></textarea>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="buttons" id="buttons">
+                <button class="btn btn-primary" id="start-btn" onclick="startGame()">
+                    🌟 Începe Poezia
+                </button>
+            </div>
+
+            <!-- FINAL POEM -->
+            <div class="final-poem" id="final-poem">
+                <h2 id="final-title"></h2>
+                <p id="final-subtitle" style="color: #6abf69; margin-bottom: 10px; font-style: italic;">
+                    Poezia ta e gata! 🎉
+                </p>
+                <div class="poem-lines" id="final-lines"></div>
+                <div class="buttons" style="justify-content: center; margin-top: 20px;">
+                    <button class="btn btn-success" onclick="savePoem()">
+                        💾 <span id="btn-save-label">Salvează Poezia</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="copyPoem()">
+                        📋 <span id="btn-copy-label">Copiază</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="newPoem()">
+                        ✨ <span id="btn-new-label">Poezie Nouă</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SAVED TAB -->
+    <div id="tab-saved" class="tab-content">
+        <div id="saved-poems-container">
+            <p class="no-poems" id="no-poems-text">
+                Nu ai poezii salvate încă. Scrie prima ta poezie! 🌸
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+// ===== STATE =====
+let currentLang = 'ro';
+let aiEnabled = false;
+let apiKey = localStorage.getItem('rhymetime_api_key') || '';
+let gameState = {
+    active: false,
+    currentVerse: 0,
+    totalVerses: 8,
+    verses: [],
+    currentPoem: null,
+    isGenerating: false
+};
+
+// ===== TRADUCERI =====
+const translations = {
+    ro: {
+        mainTitle: "✨ RhymeTime ✨",
+        subtitle: "Where every line finds its rhyme",
+        tabWrite: "Scrie Poezie",
+        tabSaved: "Poeziile Mele",
+        titleLabel: "📌 Titlul poeziei",
+        titlePlaceholder: "Dă un titlu poeziei tale...",
+        progressText: "Vers {current} din {total}",
+        rimeLabel: "💡 Sugestii de rimă",
+        inputPlaceholder: "Scrie versul tău aici...",
+        startLabel: "Apasă \"Începe\" pentru a porni jocul",
+        startBtn: "🌟 Începe Poezia",
+        addVerseBtn: "➡️ Adaugă Versul",
+        skipBtn: "⏭️ Sari Peste",
+        resetBtn: "🔄 Resetează",
+        saveBtn: "Salvează Poezia",
+        copyBtn: "Copiază",
+        newBtn: "Poezie Nouă",
+        finalSubtitle: "Poezia ta e gata! 🎉",
+        noPoems: "Nu ai poezii salvate încă. Scrie prima ta poezie! 🌸",
+        confirmReset: "Ești sigur că vrei să resetezi? Poezia curentă se va pierde.",
+        confirmDelete: "Ștergi această poezie?",
+        notifSaved: "💾 Poezia a fost salvată!",
+        notifCopied: "📋 Poezia a fost copiată!",
+        notifDeleted: "🗑️ Poezia a fost ștearsă!",
+        notifEmpty: "✏️ Scrie ceva mai întâi!",
+        notifNoKey: "🔑 Introduceți cheia API mai întâi!",
+        notifNoTitle: "📌 Introduceți un titlu mai întâi!",
+        verseLabel: "✍️ Scrie versul {num}:",
+        copyCardBtn: "📋 Copiază",
+        deleteCardBtn: "🗑️ Șterge",
+        aiToggleTitle: "Activează AI Powered",
+        aiKeyLabel: "Lipește cheia Gemini API",
+        aiSaveBtn: "Salvează",
+        aiSavedOk: "✅ Cheie API salvată! AI activat.",
+        aiError: "❌ Eroare! Verifică cheia API.",
+        aiGenerating: "Generez un vers...",
+        aiRhyming: "Generez rime...",
+        aiPoweredBadge: "🤖 AI",
+        generatingVerse: "Generez un vers",
+    },
+    en: {
+        mainTitle: "✨ RhymeTime ✨",
+        subtitle: "Where every line finds its rhyme",
+        tabWrite: "Write Poetry",
+        tabSaved: "My Poems",
+        titleLabel: "📌 Poem title",
+        titlePlaceholder: "Give your poem a title...",
+        progressText: "Line {current} of {total}",
+        rimeLabel: "💡 Rhyme suggestions",
+        inputPlaceholder: "Write your line here...",
+        startLabel: "Press \"Start\" to begin the game",
+        startBtn: "🌟 Start Poem",
+        addVerseBtn: "➡️ Add Line",
+        skipBtn: "⏭️ Skip",
+        resetBtn: "🔄 Reset",
+        saveBtn: "Save Poem",
+        copyBtn: "Copy",
+        newBtn: "New Poem",
+        finalSubtitle: "Your poem is ready! 🎉",
+        noPoems: "No saved poems yet. Write your first poem! 🌸",
+        confirmReset: "Are you sure you want to reset? The current poem will be lost.",
+        confirmDelete: "Delete this poem?",
+        notifSaved: "💾 Poem saved!",
+        notifCopied: "📋 Poem copied!",
+        notifDeleted: "🗑️ Poem deleted!",
+        notifEmpty: "✏️ Write something first!",
+        notifNoKey: "🔑 Please enter your API key first!",
+        notifNoTitle: "📌 Please enter a title first!",
+        verseLabel: "✍️ Write line {num}:",
+        copyCardBtn: "📋 Copy",
+        deleteCardBtn: "🗑️ Delete",
+        aiToggleTitle: "Enable AI Powered",
+        aiKeyLabel: "Paste your Gemini API Key",
+        aiSaveBtn: "Save",
+        aiSavedOk: "✅ API Key saved! AI enabled.",
+        aiError: "❌ Error! Check your API key.",
+        aiGenerating: "Generating a verse...",
+        aiRhyming: "Generating rhymes...",
+        aiPoweredBadge: "🤖 AI",
+        generatingVerse: "Generating a verse",
+    }
+};
+
+// ===== CUVINTE ROMÂNĂ =====
+const wordsRO = {
+    natura: {
+        substantive: ["vântul", "frunza", "ploaia", "soarele", "floarea", "copacul",
+            "câmpul", "cerul", "pământul", "luna", "steaua", "roua", "bruma",
+            "ninsoarea", "codrul", "izvorul", "muntele", "valea", "norii", "curcubeul"],
+        adjective: ["verde", "albastru", "auriu", "argintiu", "rece", "cald", "blând",
+            "sălbatic", "veșnic", "tăcut", "adânc", "înalt", "fragil", "puternic", "misterios"],
+        verbe: ["cântă", "șoptește", "dansează", "zboară", "crește", "înflorește",
+            "curge", "strălucește", "adoarme", "se trezește", "tremură", "se pierde",
+            "renaște", "plutește"]
+    },
+    emotii: {
+        substantive: ["dorul", "bucuria", "tristețea", "iubirea", "speranța", "visul",
+            "teama", "liniștea", "durerea", "fericirea", "nostalgia", "tăcerea",
+            "sufletul", "inima", "gândul"],
+        adjective: ["pierdut", "regăsit", "frânt", "întreg", "rătăcit", "luminos",
+            "întunecat", "cald", "rece", "dulce", "amar", "pur", "adânc", "tainic", "vechi"],
+        verbe: ["simte", "iubește", "plânge", "râde", "visează", "speră", "suferă",
+            "caută", "găsește", "pierde", "înțelege", "uită", "își amintește", "tânjește"]
+    },
+    noapte: {
+        substantive: ["luna", "stelele", "umbra", "visul", "noaptea", "întunericul",
+            "lumina", "tăcerea", "ceața", "miezul nopții", "zorile", "amurgul",
+            "constelația", "infinitul", "misterul"],
+        adjective: ["nocturn", "argintiu", "întunecat", "luminos", "tainic", "adormit",
+            "treaz", "rece", "misterios", "îndepărtat", "aproape", "veșnic", "efemer", "magic"],
+        verbe: ["strălucește", "adoarme", "visează", "plutește", "dispare", "apare",
+            "șoptește", "veghează", "se ascunde", "se dezvăluie", "dansează", "se stinge"]
+    },
+    oras: {
+        substantive: ["zgomotul", "luminile", "strada", "mulțimea", "fereastra",
+            "umbrela", "ploaia", "asfaltul", "clădirile", "trecătorii", "cafeneaua",
+            "parcul", "podul", "tramvaiul", "noaptea"],
+        adjective: ["agitat", "liniștit", "colorat", "cenușiu", "viu", "pustiu",
+            "modern", "vechi", "familiar", "străin", "rece", "cald", "umed", "luminos"],
+        verbe: ["aleargă", "trece", "se pierde", "se regăsește", "privește", "ascultă",
+            "simte", "respiră", "merge", "se oprește", "caută", "găsește"]
+    },
+    mare: {
+        substantive: ["valurile", "adâncul", "țărmul", "spuma", "sarea", "nisipul",
+            "orizontul", "marea", "vântul", "pescărușul", "corabia", "ancora",
+            "furtuna", "liniștea", "ecoul"],
+        adjective: ["adânc", "nesfârșit", "albastru", "verde", "furios", "liniștit",
+            "sălbatic", "liber", "vast", "necunoscut", "misterios", "puternic", "blând", "rece"],
+        verbe: ["urlă", "șoptește", "se sparge", "se retrage", "înghite", "eliberează",
+            "cheamă", "răspunde", "se ridică", "se lasă", "plutește", "se pierde"]
+    }
+};
+
+// ===== CUVINTE ENGLEZĂ =====
+const wordsEN = {
+    nature: {
+        nouns: ["the wind", "the leaf", "the rain", "the sun", "the flower", "the tree",
+            "the field", "the sky", "the earth", "the moon", "the star", "the dew",
+            "the frost", "the snow", "the forest", "the stream", "the mountain",
+            "the valley", "the clouds", "the rainbow"],
+        adjectives: ["green", "blue", "golden", "silver", "cold", "warm", "gentle",
+            "wild", "eternal", "silent", "deep", "tall", "fragile", "strong", "mysterious"],
+        verbs: ["sings", "whispers", "dances", "flies", "grows", "blooms", "flows",
+            "shines", "sleeps", "awakens", "trembles", "vanishes", "drifts", "glows"]
+    },
+    emotions: {
+        nouns: ["longing", "joy", "sorrow", "love", "hope", "the dream", "fear",
+            "peace", "pain", "happiness", "nostalgia", "silence", "the soul",
+            "the heart", "the thought"],
+        adjectives: ["lost", "found", "broken", "whole", "wandering", "bright", "dark",
+            "warm", "cold", "sweet", "bitter", "pure", "deep", "secret", "old"],
+        verbs: ["feels", "loves", "weeps", "laughs", "dreams", "hopes", "suffers",
+            "searches", "finds", "loses", "understands", "forgets", "remembers", "yearns"]
+    },
+    night: {
+        nouns: ["the moon", "the stars", "the shadow", "the dream", "the night",
+            "the darkness", "the light", "the silence", "the mist", "midnight",
+            "the dawn", "the dusk", "the constellation", "infinity", "the mystery"],
+        adjectives: ["nocturnal", "silver", "dark", "bright", "secret", "sleeping",
+            "awake", "cold", "mysterious", "distant", "near", "eternal", "fleeting", "magical"],
+        verbs: ["glows", "sleeps", "dreams", "drifts", "fades", "appears", "whispers",
+            "watches", "hides", "reveals", "dances", "dies out"]
+    },
+    city: {
+        nouns: ["the noise", "the lights", "the street", "the crowd", "the window",
+            "the umbrella", "the rain", "the pavement", "the buildings", "the strangers",
+            "the café", "the park", "the bridge", "the tram", "the night"],
+        adjectives: ["busy", "quiet", "colorful", "grey", "alive", "empty", "modern",
+            "old", "familiar", "strange", "cold", "warm", "wet", "bright"],
+        verbs: ["runs", "passes", "gets lost", "finds itself", "watches", "listens",
+            "feels", "breathes", "walks", "stops", "searches", "finds"]
+    },
+    sea: {
+        nouns: ["the waves", "the deep", "the shore", "the foam", "the salt",
+            "the sand", "the horizon", "the sea", "the wind", "the seagull",
+            "the ship", "the anchor", "the storm", "the calm", "the echo"],
+        adjectives: ["deep", "endless", "blue", "green", "furious", "calm", "wild",
+            "free", "vast", "unknown", "mysterious", "powerful", "gentle", "cold"],
+        verbs: ["roars", "whispers", "crashes", "retreats", "swallows", "releases",
+            "calls", "answers", "rises", "falls", "drifts", "vanishes"]
+    }
+};
+
+// ===== RIME ROMÂNĂ =====
+const rimeRO = {
+    "vântul": ["cântul", "gândul", "sfântul", "frământul"],
+    "luna": ["bruna", "nebuna", "furtuna", "minuna"],
+    "stelele": ["florile", "zorile", "dorurile", "norile"],
+    "inima": ["prima", "clima", "anima", "rima"],
+    "visul": ["nisul", "abisul", "paradisul", "narcisul"],
+    "marea": ["steaua", "calea", "valea", "ploaia"],
+    "noaptea": ["soarta", "poarta", "moartea", "coasta"],
+    "iubirea": ["venirea", "plecarea", "chemarea", "uitarea"],
+    "sufletul": ["gestul", "restul", "vestul", "textul"],
+    "default": ["iubire", "simțire", "trăire", "gândire", "visare",
+        "speranță", "dorință", "lumină", "inimă", "suflet",
+        "zbor", "dor", "floare", "soare", "mare", "zare"]
+};
+
+// ===== RIME ENGLEZĂ =====
+const rimeEN = {
+    "dream": ["gleam", "stream", "beam", "seem", "team"],
+    "night": ["light", "bright", "sight", "right", "flight"],
+    "heart": ["start", "art", "part", "apart", "chart"],
+    "love": ["above", "dove", "of", "shove", "glove"],
+    "sky": ["fly", "high", "cry", "by", "why"],
+    "sea": ["free", "be", "me", "tree", "see"],
+    "moon": ["soon", "tune", "June", "bloom", "room"],
+    "rain": ["pain", "again", "remain", "chain", "plain"],
+    "soul": ["whole", "role", "goal", "toll", "stroll"],
+    "default": ["dream", "gleam", "light", "night", "heart", "start",
+        "love", "above", "free", "sea", "moon", "soon",
+        "soul", "whole", "rain", "pain"]
+};
+
+// ===== TEMPLATES ROMÂNĂ =====
+const templatesRO = [
+    "{subst} {adj} {verb} în zare,",
+    "Când {subst} {verb} încet,",
+    "{subst} cel {adj} și {adj},",
+    "Prin {subst}, {subst} {verb},",
+    "{subst} {verb} ca un {subst},",
+    "Sub {subst} {adj}, {subst} {verb},",
+    "Și {subst} {adj} {verb} departe,",
+    "Iar {subst} {verb} în {subst},",
+    "O, {subst} {adj} și {adj}!",
+    "{subst} și {subst} se {verb},",
+    "Când {subst} {verb} și {verb},",
+    "Prin {subst} {adj}, {verb} mereu,"
+];
+
+// ===== TEMPLATES ENGLEZĂ =====
+const templatesEN = [
+    "{noun} {adj} {verb} far away,",
+    "When {noun} {verb} so slow,",
+    "{noun} so {adj} and {adj},",
+    "Through {noun}, {noun} {verb},",
+    "{noun} {verb} like a {noun},",
+    "Beneath {adj} {noun}, {noun} {verb},",
+    "And {adj} {noun} {verb} afar,",
+    "While {noun} {verb} in {noun},",
+    "Oh, {adj} {noun} so {adj}!",
+    "{noun} and {noun} {verb},",
+    "When {noun} {verb} and {verb},",
+    "Through {adj} {noun}, forever {verb},"
+];
+
+// ===== AI TOGGLE =====
+function toggleAiPanel() {
+    const toggle = document.getElementById('ai-toggle');
+    toggle.checked = !toggle.checked;
+    onAiToggleChange();
+}
+
+function onAiToggleChange() {
+    const toggle = document.getElementById('ai-toggle');
+    const panel = document.getElementById('ai-key-panel');
+    const badge = document.getElementById('ai-badge');
+
+    aiEnabled = toggle.checked;
+
+    if (aiEnabled) {
+        panel.classList.add('visible');
+        badge.textContent = 'ON';
+        badge.classList.add('active');
+
+        if (apiKey) {
+            document.getElementById('api-key-input').value = apiKey;
+            document.getElementById('ai-status').textContent = tr('aiSavedOk');
+            document.getElementById('ai-status').className = 'ai-status ok';
+        }
+    } else {
+        panel.classList.remove('visible');
+        badge.textContent = 'OFF';
+        badge.classList.remove('active');
+        aiEnabled = false;
+    }
+}
+
+function saveApiKey() {
+    const input = document.getElementById('api-key-input').value.trim();
+    const status = document.getElementById('ai-status');
+
+    if (!input) {
+        status.textContent = tr('aiError');
+        status.className = 'ai-status error';
+        return;
+    }
+
+    apiKey = input;
+    localStorage.setItem('rhymetime_api_key', apiKey);
+    aiEnabled = true;
+
+    status.textContent = tr('aiSavedOk');
+    status.className = 'ai-status ok';
+    showNotification(tr('aiSavedOk'));
+}
+
+// ===== GEMINI API =====
+async function generateVerseWithGemini(title, previousVerses, lang) {
+    const isRo = lang === 'ro';
+    const previousText = previousVerses.length > 0
+        ? previousVerses.map((v, i) => `${i + 1}: ${v.text}`).join('\n')
+        : (isRo ? 'Acesta este primul vers.' : 'This is the first verse.');
+
+    const lastVerse = previousVerses.length > 0
+        ? previousVerses[previousVerses.length - 1].text
+        : '';
+
+    const prompt = isRo
+        ? `Ești un poet român talentat. Scrie UN SINGUR vers poetic în română.
+
+Titlul poeziei: "${title}"
+Versurile scrise până acum:
+${previousText}
+
+Reguli STRICTE:
+- Scrie EXACT un singur vers (un rând)
+- Versul TREBUIE să rimeze cu: "${lastVerse}"
+- Acorduri gramaticale 100% corecte în română
+- Versul să aibă sens poetic real
+- Legat de tema titlului "${title}"
+- FĂRĂ numere, ghilimele sau explicații
+- Răspunde DOAR cu versul`
+        : `You are a talented poet. Write ONE single poetic line in English.
+
+Poem title: "${title}"
+Lines written so far:
+${previousText}
+
+STRICT rules:
+- Write EXACTLY one line
+- The line MUST rhyme with: "${lastVerse}"
+- Correct English grammar
+- Poetically meaningful
+- Thematically connected to "${title}"
+- NO numbers, quotes or explanations
+- Reply with ONLY the line`;
+
+    const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.9,
+                    maxOutputTokens: 100,
+                }
+            })
+        }
+    );
+
+    if (!response.ok) throw new Error('API Error: ' + response.status);
+
+    const data = await response.json();
+    let verse = data.candidates[0].content.parts[0].text.trim();
+    verse = verse.replace(/^["']|["']$/g, '');
+    verse = verse.replace(/^\d+[\.\)]\s*/, '');
+    verse = verse.split('\n')[0].trim();
+    return verse;
+}
+
+async function getRimesWithGemini(verse, lang) {
+    const isRo = lang === 'ro';
+    const prompt = isRo
+        ? `Dă-mi exact 6 cuvinte în română care rimează cu ultimul cuvânt din: "${verse}"
+- Doar cuvinte care rimează REAL
+- Cuvinte poetice și frumoase
+- Separate prin virgulă
+- DOAR cuvintele`
+        : `Give me exactly 6 English words that truly rhyme with the last word in: "${verse}"
+- Only real rhymes
+- Poetic words
+- Comma separated
+- ONLY the words`;
+
+    const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.5, maxOutputTokens: 60 }
+            })
+        }
+    );
+
+    if (!response.ok) return [];
+    const data = await response.json();
+    const text = data.candidates[0].content.parts[0].text.trim();
+    return text.split(',').map(w => w.trim()).filter(w => w.length > 0).slice(0, 6);
+}
+
+// ===== LANGUAGE =====
+function setLanguage(lang) {
+    currentLang = lang;
+
+    document.getElementById('lang-ro').classList.toggle('active', lang === 'ro');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+    const t = translations[lang];
+
+    document.getElementById('main-title').textContent = t.mainTitle;
+    document.getElementById('main-subtitle').textContent = t.subtitle;
+    document.getElementById('tab-write-label').textContent = t.tabWrite;
+    document.getElementById('tab-saved-label').textContent = t.tabSaved;
+    document.getElementById('title-label').textContent = t.titleLabel;
+    document.getElementById('poem-title').placeholder = t.titlePlaceholder;
+    document.getElementById('rime-label').textContent = t.rimeLabel;
+    document.getElementById('verse-input').placeholder = t.inputPlaceholder;
+    document.getElementById('final-subtitle').textContent = t.finalSubtitle;
+    document.getElementById('btn-save-label').textContent = t.saveBtn;
+    document.getElementById('btn-copy-label').textContent = t.copyBtn;
+    document.getElementById('btn-new-label').textContent = t.newBtn;
+    document.getElementById('no-poems-text').textContent = t.noPoems;
+    document.getElementById('ai-toggle-title').textContent = t.aiToggleTitle;
+    document.getElementById('ai-key-label-text').textContent = t.aiKeyLabel;
+    document.getElementById('ai-save-label').textContent = t.aiSaveBtn;
+
+    if (!gameState.active) {
+        document.getElementById('input-label').textContent = t.startLabel;
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) startBtn.innerHTML = t.startBtn;
+    }
+
+    document.getElementById('progress-text').textContent =
+        t.progressText
+            .replace('{current}', gameState.currentVerse)
+            .replace('{total}', gameState.totalVerses);
+
+    loadSavedPoems();
+}
+
+function tr(key, replacements = {}) {
+    let text = translations[currentLang][key] || key;
+    Object.entries(replacements).forEach(([k, v]) => {
+        text = text.replace(`{${k}}`, v);
+    });
+    return text;
+}
+
+// ===== HELPERS =====
+function getRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getAllWords(type) {
+    const wordSet = currentLang === 'ro' ? wordsRO : wordsEN;
+    const key = currentLang === 'ro' ? type : (
+        type === 'substantive' ? 'nouns' :
+        type === 'adjective' ? 'adjectives' :
+        type === 'verbe' ? 'verbs' : type
+    );
+    let all = [];
+    Object.values(wordSet).forEach(cat => {
+        if (cat[key]) all = all.concat(cat[key]);
+    });
+    return all;
+}
+
+function generateVerseRandom() {
+    const templates = currentLang === 'ro' ? templatesRO : templatesEN;
+    const template = getRandom(templates);
+    const allNouns = getAllWords('substantive');
+    const allAdj = getAllWords('adjective');
+    const allVerbs = getAllWords('verbe');
+
+    let verse = template
+        .replace(/{subst}/g, () => getRandom(allNouns))
+        .replace(/{noun}/g, () => getRandom(allNouns))
+        .replace(/{adj}/g, () => getRandom(allAdj))
+        .replace(/{verb}/g, () => getRandom(allVerbs));
+
+    return verse.charAt(0).toUpperCase() + verse.slice(1);
+}
+
+function getRimesRandom(verse) {
+    const rimeDB = currentLang === 'ro' ? rimeRO : rimeEN;
+    const wordsInVerse = verse.toLowerCase().split(' ');
+    const lastWord = wordsInVerse[wordsInVerse.length - 1].replace(/[,!?.]/, '');
+
+    for (let key in rimeDB) {
+        if (key !== 'default' && (lastWord.includes(key) || key.includes(lastWord))) {
+            return rimeDB[key];
+        }
+    }
+    return rimeDB['default'].sort(() => Math.random() - 0.5).slice(0, 6);
+}
+
+// ===== GAME =====
+function startGame() {
+    const title = document.getElementById('poem-title').value.trim();
+    if (!title) {
+        showNotification(tr('notifNoTitle'));
+        document.getElementById('poem-title').focus();
+        return;
+    }
+
+    if (aiEnabled && !apiKey) {
+        showNotification(tr('notifNoKey'));
+        document.getElementById('api-key-input').focus();
+        return;
+    }
+
+    gameState.active = true;
+    gameState.currentVerse = 0;
+    gameState.verses = [];
+    gameState.isGenerating = false;
+
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) startBtn.style.display = 'none';
+
+    document.getElementById('verse-input').disabled = false;
+    document.getElementById('verses-container').innerHTML = '';
+    document.getElementById('final-poem').style.display = 'none';
+
+    generateAndShowVerse();
+}
+
+async function generateAndShowVerse() {
+    if (gameState.isGenerating) return;
+    gameState.isGenerating = true;
+
+    const title = document.getElementById('poem-title').value.trim();
+
+    setButtonsDisabled(true);
+    document.getElementById('verse-input').disabled = true;
+
+    const loadingId = 'loading-' + Date.now();
+
+    if (aiEnabled && apiKey) {
+        // === AI MODE ===
+        addLoadingToUI(loadingId);
+        try {
+            const verse = await generateVerseWithGemini(title, gameState.verses, currentLang);
+            removeLoading(loadingId);
+
+            gameState.verses.push({ text: verse, type: 'generated' });
+            gameState.currentVerse++;
+            addVerseToUI(verse, 'generated', gameState.currentVerse);
+            updateProgress();
+
+            if (gameState.currentVerse < gameState.totalVerses) {
+                setupInputForNextVerse();
+
+                // Rime cu AI
+                document.getElementById('rime-section').style.display = 'block';
+                document.getElementById('rime-tags').innerHTML =
+                    `<span style="color:#b8860b; font-style:italic; font-size:0.85em;">
+                        ⏳ ${tr('aiRhyming')}
+                    </span>`;
+
+                getRimesWithGemini(verse, currentLang).then(rimes => {
+                    if (rimes.length > 0) showRimes(rimes);
+                });
+            } else {
+                finishPoem();
+            }
+
+        } catch (error) {
+            removeLoading(loadingId);
+            console.error(error);
+            showNotification('❌ ' + tr('aiError'));
+            document.getElementById('ai-status').textContent = tr('aiError');
+            document.getElementById('ai-status').className = 'ai-status error';
+            setButtonsDisabled(false);
+            document.getElementById('verse-input').disabled = false;
+        }
+
+    } else {
+        // === RANDOM MODE ===
+        const verse = generateVerseRandom();
+        gameState.verses.push({ text: verse, type: 'generated' });
+        gameState.currentVerse++;
+        addVerseToUI(verse, 'generated', gameState.currentVerse);
+        updateProgress();
+
+        if (gameState.currentVerse < gameState.totalVerses) {
+            setupInputForNextVerse();
+            showRimes(getRimesRandom(verse));
+        } else {
+            finishPoem();
+        }
+    }
+
+    gameState.isGenerating = false;
+}
+
+function setupInputForNextVerse() {
+    document.getElementById('input-label').textContent =
+        tr('verseLabel', { num: gameState.currentVerse + 1 });
+    document.getElementById('verse-input').value = '';
+    document.getElementById('verse-input').disabled = false;
+    document.getElementById('verse-input').focus();
+    setButtonsDisabled(false);
+    document.getElementById('buttons').innerHTML = `
+        <button class="btn btn-primary" onclick="submitVerse()">${tr('addVerseBtn')}</button>
+        <button class="btn btn-secondary" onclick="skipVerse()">${tr('skipBtn')}</button>
+        <button class="btn btn-danger" onclick="resetGame()">${tr('resetBtn')}</button>
+    `;
+}
+
+function addLoadingToUI(id) {
+    const container = document.getElementById('verses-container');
+    const div = document.createElement('div');
+    div.className = 'verse';
+    div.id = id;
+    div.innerHTML = `
+        <div class="verse-number generated">...</div>
+        <div class="verse-text loading">
+            ${tr('generatingVerse')}
+            <div class="loading-dots">
+                <span>
