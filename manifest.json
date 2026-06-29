@@ -1,6 +1,6 @@
 {
-  "name": "Copper & Thyme",
-  "short_name": "C&T",
+  "name": "Verdigris",
+  "short_name": "Verdigris",
   "description": "A cozy pantry for every recipe screenshot, link, and scribble worth keeping.",
   "start_url": "./index.html",
   "scope": "./",

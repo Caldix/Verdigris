@@ -1,5 +1,5 @@
 /* ===========================================================
-   Copper Larder — design tokens
+   Verdigris — design tokens
    =========================================================== */
 :root {
   /* greens */
@@ -197,21 +197,41 @@ button { font-family: var(--font-body); cursor: pointer; }
 .btn-danger .icon { stroke: var(--copper-dark); }
 
 /* ===========================================================
-   Tag bar — hanging pantry labels
+   Tag section — a little hanging-label cloud, always visible
    =========================================================== */
-.tag-bar {
+.tag-section {
   position: relative;
   z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 20px 4px;
+}
+.tag-section-head {
   display: flex;
-  gap: 10px;
-  padding: 14px 20px 6px;
-  overflow-x: auto;
-  scrollbar-width: thin;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+.tag-section-head .icon { width: 15px; height: 15px; stroke: var(--copper); }
+.tag-section-head h2 {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0;
+  font-weight: 700;
+}
+
+.tag-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: center;
 }
 
 .tag-chip {
   position: relative;
-  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -225,7 +245,12 @@ button { font-family: var(--font-body); cursor: pointer; }
   border-radius: 3px 10px 10px 3px;
   cursor: pointer;
   white-space: nowrap;
+  line-height: 1.3;
 }
+/* tag-cloud sizing — busier tags read a little bigger */
+.tag-chip.size-2 { font-size: 0.82rem; padding: 8px 15px 8px 21px; }
+.tag-chip.size-3 { font-size: 0.92rem; padding: 9px 16px 9px 22px; font-weight: 700; }
+
 .tag-chip::before {
   content: "";
   position: absolute;
@@ -248,6 +273,7 @@ button { font-family: var(--font-body); cursor: pointer; }
 
 /* ===========================================================
    Recipe grid — index cards pinned to the board
+
    =========================================================== */
 main#mainArea { position: relative; z-index: 1; padding: 10px 20px 40px; max-width: 1180px; margin: 0 auto; }
 
@@ -305,7 +331,7 @@ main#mainArea { position: relative; z-index: 1; padding: 10px 20px 40px; max-wid
 
 .card-thumb {
   width: 100%;
-  height: 140px;
+  height: 190px;
   border-radius: 6px;
   overflow: hidden;
   margin-bottom: 10px;
@@ -581,9 +607,11 @@ dialog.sheet::backdrop { background: rgba(20, 24, 18, 0.55); backdrop-filter: bl
   width: 100%;
   flex: 0 0 100%;
   scroll-snap-align: start;
-  max-height: 320px;
+  max-height: 58vh;
+  min-height: 220px;
   object-fit: contain;
   background: var(--cream-deep);
+  cursor: zoom-in;
 }
 .gallery-nav {
   position: absolute;
@@ -644,6 +672,50 @@ dialog.sheet::backdrop { background: rgba(20, 24, 18, 0.55); backdrop-filter: bl
 }
 
 /* ===========================================================
+   Lightbox — full-size image view
+   =========================================================== */
+dialog.lightbox {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  background: rgba(15, 18, 14, 0.94);
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+dialog.lightbox::backdrop { background: transparent; }
+dialog.lightbox img {
+  max-width: 92vw;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.12);
+  z-index: 3;
+}
+.lightbox-close .icon { stroke: var(--cream); }
+.lightbox-close:hover { background: rgba(255,255,255,0.22); }
+.lightbox-prev, .lightbox-next {
+  background: rgba(255,255,255,0.12);
+  width: 44px;
+  height: 44px;
+}
+.lightbox-prev { left: 16px; }
+.lightbox-next { right: 16px; }
+.lightbox-prev:hover, .lightbox-next:hover { background: rgba(255,255,255,0.22); }
+
+/* ===========================================================
    Toast
    =========================================================== */
 .toast {
@@ -677,7 +749,7 @@ dialog.sheet::backdrop { background: rgba(20, 24, 18, 0.55); backdrop-filter: bl
   .app-header { padding: 18px 14px 14px; }
   .brand-text h1 { font-size: 1.35rem; }
   main#mainArea { padding: 8px 14px 30px; }
-  .tag-bar { padding: 12px 14px 4px; }
+  .tag-section { padding: 12px 14px 4px; }
   .recipe-grid { gap: 18px 14px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   dialog.sheet { width: 94vw; max-height: 92vh; }
 }

@@ -1,4 +1,4 @@
-// Copper & Thyme — service worker
+// Verdigris — service worker
 // Network-first caching (so new deploys aren't stuck behind a stale cache),
 // plus handling of the Web Share Target POST.
 

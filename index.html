@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Copper & Thyme — your recipe pantry</title>
+<title>Verdigris — your recipe pantry</title>
 <meta name="description" content="A cozy pantry for every recipe screenshot, link, and scribble worth keeping." />
 <meta name="theme-color" content="#2A3D31" />
 <link rel="manifest" href="./manifest.json" />
@@ -43,8 +43,8 @@
   <div class="brand">
     <svg class="brand-pot" viewBox="0 0 24 24"><use href="#i-pot"/></svg>
     <div class="brand-text">
-      <h1>Copper & Thyme</h1>
-      <p class="tagline">every recipe worth keeping, in one warm pantry</p>
+      <h1>Verdigris</h1>
+      <p class="tagline">the patina of a kitchen well-loved</p>
     </div>
   </div>
 
@@ -70,9 +70,15 @@
   </div>
 </header>
 
-<nav id="tagBar" class="tag-bar" aria-label="Filter by tag">
-  <!-- chips injected by app.js -->
-</nav>
+<section class="tag-section" id="tagSection" hidden>
+  <div class="tag-section-head">
+    <svg class="icon"><use href="#i-leaf"/></svg>
+    <h2>Browse by tag</h2>
+  </div>
+  <nav id="tagBar" class="tag-bar" aria-label="Filter by tag">
+    <!-- chips injected by app.js -->
+  </nav>
+</section>
 
 <main id="mainArea">
   <section id="recipeGrid" class="recipe-grid"></section>
@@ -106,7 +112,7 @@
     </button>
     <input type="file" id="importFile" accept="application/json" hidden />
   </div>
-  <p class="footer-note">Everything is stored only on this device. To share your pantry with someone — or move it to a new phone — tap "Export" and send them the file; they open Copper &amp; Thyme and tap "Import" to add it to theirs.</p>
+  <p class="footer-note">Everything is stored only on this device. To share your pantry with someone — or move it to a new phone — tap "Export" and send them the file; they open Verdigris and tap "Import" to add it to theirs.</p>
 </footer>
 
 <!-- ============ NEW / EDIT RECIPE DIALOG ============ -->
@@ -217,6 +223,20 @@
       Edit
     </button>
   </footer>
+</dialog>
+
+<!-- ============ LIGHTBOX (full-size image view) ============ -->
+<dialog id="lightbox" class="lightbox">
+  <button type="button" class="icon-btn lightbox-close" id="closeLightbox" aria-label="Close">
+    <svg class="icon"><use href="#i-close"/></svg>
+  </button>
+  <button type="button" class="gallery-nav gallery-prev lightbox-prev" id="lightboxPrev" aria-label="Previous image">
+    <svg class="icon"><use href="#i-chevron-left"/></svg>
+  </button>
+  <img id="lightboxImg" src="" alt="" />
+  <button type="button" class="gallery-nav gallery-next lightbox-next" id="lightboxNext" aria-label="Next image">
+    <svg class="icon"><use href="#i-chevron-right"/></svg>
+  </button>
 </dialog>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>

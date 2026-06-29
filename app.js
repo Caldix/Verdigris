@@ -1,5 +1,5 @@
 /* ===========================================================
-   Copper & Thyme — app.js
+   Verdigris — app.js
    =========================================================== */
 
 const DB_NAME = "copper-larder";
@@ -15,6 +15,7 @@ let currentImages = [];        // data URLs attached in the open form
 let editingId = null;          // id of recipe being edited, or null for new
 let detailRecipeId = null;     // id of recipe currently shown in detail dialog
 let galleryIndex = 0;
+let currentGalleryImages = [];
 
 /* ----------------------- IndexedDB ----------------------- */
 
@@ -136,6 +137,7 @@ function fileToDataURL(file) {
 
 function renderTagBar() {
   const bar = document.getElementById("tagBar");
+  const section = document.getElementById("tagSection");
   const counts = new Map(); // lowercase -> { label, count }
 
   recipes.forEach((r) => {
@@ -146,7 +148,11 @@ function renderTagBar() {
     });
   });
 
+  section.hidden = counts.size === 0;
+  if (counts.size === 0) return;
+
   const sorted = [...counts.entries()].sort((a, b) => a[1].label.localeCompare(b[1].label));
+  const maxCount = Math.max(...sorted.map(([, info]) => info.count));
 
   bar.innerHTML = "";
 
@@ -160,7 +166,10 @@ function renderTagBar() {
   sorted.forEach(([key, info]) => {
     const chip = document.createElement("button");
     chip.type = "button";
-    chip.className = "tag-chip" + (activeTag === key ? " is-active" : "");
+    // simple tag-cloud effect: busier tags read a little bigger
+    const ratio = info.count / maxCount;
+    const sizeClass = ratio > 0.66 ? " size-3" : ratio > 0.33 ? " size-2" : "";
+    chip.className = "tag-chip" + sizeClass + (activeTag === key ? " is-active" : "");
     chip.innerHTML = `${escapeHTML(info.label)} <span class="count">${info.count}</span>`;
     chip.addEventListener("click", () => {
       activeTag = activeTag === key ? null : key;
@@ -388,6 +397,8 @@ function renderImagePreviews() {
     item.className = "image-preview-item";
     const img = document.createElement("img");
     img.src = src;
+    img.style.cursor = "zoom-in";
+    img.addEventListener("click", () => openLightbox(currentImages, idx));
     item.appendChild(img);
     const btn = document.createElement("button");
     btn.type = "button";
@@ -492,6 +503,7 @@ function renderGallery(images) {
   const dots = document.getElementById("galleryDots");
   track.innerHTML = "";
   dots.innerHTML = "";
+  currentGalleryImages = images;
 
   if (!images.length) {
     gallery.hidden = true;
@@ -499,10 +511,11 @@ function renderGallery(images) {
   }
   gallery.hidden = false;
 
-  images.forEach((src) => {
+  images.forEach((src, i) => {
     const img = document.createElement("img");
     img.src = src;
     img.alt = "";
+    img.addEventListener("click", () => openLightbox(images, i));
     track.appendChild(img);
   });
   images.forEach((_, i) => {
@@ -523,11 +536,36 @@ function scrollGallery(dir) {
   track.scrollBy({ left: dir * track.clientWidth, behavior: "smooth" });
 }
 
+/* ----------------------- Lightbox (full-size image view) ----------------------- */
+
+const lightbox = document.getElementById("lightbox");
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+function openLightbox(images, index) {
+  lightboxImages = images;
+  lightboxIndex = index;
+  showLightboxImage();
+  lightbox.showModal();
+}
+
+function showLightboxImage() {
+  document.getElementById("lightboxImg").src = lightboxImages[lightboxIndex] || "";
+  const multi = lightboxImages.length > 1;
+  document.getElementById("lightboxPrev").hidden = !multi;
+  document.getElementById("lightboxNext").hidden = !multi;
+}
+
+function lightboxStep(dir) {
+  lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+  showLightboxImage();
+}
+
 /* ----------------------- Export / Import ----------------------- */
 
 function exportData() {
   const payload = {
-    app: "copper-and-thyme",
+    app: "verdigris",
     exportedAt: new Date().toISOString(),
     recipes
   };
@@ -535,7 +573,7 @@ function exportData() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `copper-and-thyme-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `verdigris-backup-${new Date().toISOString().slice(0, 10)}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -574,7 +612,7 @@ async function importData(file) {
     showToast(`Imported ${added} recipe${added === 1 ? "" : "s"}`);
   } catch (err) {
     console.error(err);
-    showToast("Couldn't read that file — is it a Copper & Thyme export?");
+    showToast("Couldn't read that file — is it a Verdigris export?");
   }
 }
 
@@ -669,8 +707,17 @@ function wireEvents() {
     e.target.value = "";
   });
 
+  // lightbox
+  document.getElementById("closeLightbox").addEventListener("click", () => lightbox.close());
+  document.getElementById("lightboxPrev").addEventListener("click", () => lightboxStep(-1));
+  document.getElementById("lightboxNext").addEventListener("click", () => lightboxStep(1));
+  lightbox.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") lightboxStep(-1);
+    if (e.key === "ArrowRight") lightboxStep(1);
+  });
+
   // close dialogs on backdrop click
-  [recipeModal, detailModal].forEach((dlg) => {
+  [recipeModal, detailModal, lightbox].forEach((dlg) => {
     dlg.addEventListener("click", (e) => {
       if (e.target === dlg) dlg.close();
     });
